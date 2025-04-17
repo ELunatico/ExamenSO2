@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./api
+    ports:
+      - "8080:8080"
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: classicmodels
+      MYSQL_HOST: mysql
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: classicmodels
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./api/mysqlsampledatabase.sql:/docker-entrypoint-initdb.d/mysqlsampledatabase.sql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
